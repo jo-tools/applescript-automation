@@ -334,8 +334,8 @@ End
 		Sub CheckTerminalAppRunning()
 		  #If TargetMacOS Then
 		    If (Not ApplicationIsRunning(constBundleIdentifier_Terminal)) Then
-		      Dim d As New MessageDialog
-		      Dim b As MessageDialogButton
+		      Var d As New MessageDialog
+		      Var b As MessageDialogButton
 		      d.IconType = MessageDialog.IconTypes.Question
 		      d.ActionButton.Caption = "Launch Terminal.app"
 		      d.CancelButton.Visible = True
@@ -520,8 +520,8 @@ End
 		  #If TargetMacOS Then
 		    Self.CheckTerminalAppRunning()
 		    
-		    Dim d As New MessageDialog
-		    Dim b As MessageDialogButton
+		    Var d As New MessageDialog
+		    Var b As MessageDialogButton
 		    d.IconType = MessageDialog.IconTypes.Question
 		    d.ActionButton.Caption = "Determine Permission"
 		    d.CancelButton.Visible = True
@@ -538,10 +538,10 @@ End
 		    b = d.ShowModal(Self)
 		    Select Case b
 		    Case d.ActionButton
-		      Dim iRes As Int32 = macOS_AEDeterminePermissionToAutomateTarget(constBundleIdentifier_Terminal)
+		      Var iRes As Int32 = macOS_AEDeterminePermissionToAutomateTarget(constBundleIdentifier_Terminal)
 		      
-		      Dim sResult As String = "Result: "
-		      Dim sExplanation As String
+		      Var sResult As String = "Result: "
+		      Var sExplanation As String
 		      
 		      Select Case iRes
 		      Case CType(AEPermissionResult.procNotFound, Int32)
@@ -586,8 +586,8 @@ End
 	#tag Event
 		Sub Pressed()
 		  #If TargetMacOS Then
-		    Dim d As New MessageDialog
-		    Dim b As MessageDialogButton
+		    Var d As New MessageDialog
+		    Var b As MessageDialogButton
 		    d.IconType = MessageDialog.IconTypes.Question
 		    d.ActionButton.Caption = "System Preferences"
 		    d.CancelButton.Visible = True
@@ -620,10 +620,10 @@ End
 		  #If TargetMacOS Then
 		    self.CheckTerminalAppRunning()
 		    
-		    Dim d As MessageDialog
+		    Var d As MessageDialog
 		    #If DebugBuild Then
 		      d = New MessageDialog
-		      Dim b As MessageDialogButton
+		      Var b As MessageDialogButton
 		      d.IconType = MessageDialog.IconTypes.Question
 		      d.ActionButton.Caption = "OK"
 		      d.CancelButton.Visible = True
@@ -642,13 +642,13 @@ End
 		    
 		    '1st we need to make sure Terminal.app is running
 		    'that's not automation yet - the security will kick in later when doing "tell application"
-		    Dim sh As New Shell
+		    Var sh As New Shell
 		    sh.Execute("osascript -e 'launch application ""Terminal""' -e 'delay 1'")
 		    If (sh.ExitCode <> 0) Then Break
 		    
 		    'ok, now that Terminal.app should be running, let's determine if we can automate it.
-		    Dim sResult As String
-		    Dim sExplanation As String
+		    Var sResult As String
+		    Var sExplanation As String
 		    
 		    Select Case macOS_AEDeterminePermissionToAutomateTarget(constBundleIdentifier_Terminal)
 		    Case CType(AEPermissionResult.procNotFound, Int32)
@@ -678,7 +678,7 @@ End
 		      Return
 		    End If
 		    
-		    Dim sTitle As String = ""
+		    Var sTitle As String = ""
 		    sResult = ""
 		    sExplanation = ""
 		    
@@ -694,7 +694,7 @@ End
 		    'In Terminal, execute: tccutil reset AppleEvents
 		    '**********************************************************
 		    
-		    Dim oNow As DateTime = DateTime.Now
+		    Var oNow As DateTime = DateTime.Now
 		    sh.Execute("osascript -e 'tell application ""Terminal""' -e 'if not (exists window 1) then reopen' -e 'activate' -e 'do script ""echo \""Xojo AppleScript Example " + oNow.SQLDateTime + "\"""" in Window 1' -e 'activate' -e 'end tell'")
 		    
 		    If (sh.ExitCode = 0) Then

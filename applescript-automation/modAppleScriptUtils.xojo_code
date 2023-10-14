@@ -1,6 +1,6 @@
 #tag Module
 Protected Module modAppleScriptUtils
-	#tag CompatibilityFlags = (TargetConsole and (Target32Bit or Target64Bit)) or  (TargetDesktop and (Target32Bit or Target64Bit))
+	#tag CompatibilityFlags = ( TargetConsole and ( Target32Bit or Target64Bit ) ) or ( TargetDesktop and ( Target32Bit or Target64Bit ) )
 	#tag Method, Flags = &h0, CompatibilityFlags = (TargetConsole and (Target32Bit or Target64Bit)) or  (TargetDesktop and (Target32Bit or Target64Bit))
 		Function macOS_AEDeterminePermissionToAutomateTarget(psTargetBundleIdentifier As String) As Int32
 		  #If TargetMacOS Then
@@ -21,16 +21,24 @@ Protected Module modAppleScriptUtils
 		      Return CType(AEPermissionResult.noErr, Int32) 'not available, no issue
 		    End If
 		    
-		    Declare Function NSClassFromString Lib "Cocoa" (className As CFStringRef) As Ptr
-		    Soft Declare Function descriptorWithBundleIdentifier Lib "Foundation" Selector "descriptorWithBundleIdentifier:" (ptrNSAppleEventDescriptorClass As Ptr, bundleIdentifier As CFStringRef) As Ptr 'macOS 10.11+
-		    Declare Function aeDesc Lib "Foundation" Selector "aeDesc" (ptrNSAppleEventDescriptor As Ptr) As Ptr
-		    
-		    Soft Declare Function AEDeterminePermissionToAutomateTarget Lib "Cocoa" (targetAEAddressDesc As Ptr, theAEEventClass As CFStringRef, theAEEventID As CFStringRef, askUserIfNeeded As Boolean) As Int32 'macOS 10.14+
-		    
-		    Dim ptrNSAppleEventDescriptorClass As Ptr = NSClassFromString("NSAppleEventDescriptor")
-		    Dim ptrNSAppleEventDescriptor As Ptr = descriptorWithBundleIdentifier(ptrNSAppleEventDescriptorClass, psTargetBundleIdentifier)
-		    Dim ptrAeDesc As Ptr = aeDesc(ptrNSAppleEventDescriptor)
-		    Return AEDeterminePermissionToAutomateTarget(ptrAeDesc, "****", "****", False)
+		    Try
+		      // https://developer.apple.com/documentation/coreservices/3025784-aedeterminepermissiontoautomatet?language=objc
+		      
+		      Declare Function NSClassFromString Lib "Cocoa" (className As CFStringRef) As Ptr
+		      Soft Declare Function descriptorWithBundleIdentifier Lib "Foundation" Selector "descriptorWithBundleIdentifier:" (ptrNSAppleEventDescriptorClass As Ptr, bundleIdentifier As CFStringRef) As Ptr 'macOS 10.11+
+		      Declare Function aeDesc Lib "Foundation" Selector "aeDesc" (ptrNSAppleEventDescriptor As Ptr) As Ptr
+		      
+		      Soft Declare Function AEDeterminePermissionToAutomateTarget Lib "Cocoa" (targetAEAddressDesc As Ptr, theAEEventClass As CFStringRef, theAEEventID As CFStringRef, askUserIfNeeded As Boolean) As Int32 'macOS 10.14+
+		      
+		      Var ptrNSAppleEventDescriptorClass As Ptr = NSClassFromString("NSAppleEventDescriptor")
+		      Var ptrNSAppleEventDescriptor As Ptr = descriptorWithBundleIdentifier(ptrNSAppleEventDescriptorClass, psTargetBundleIdentifier)
+		      Var ptrAeDesc As Ptr = aeDesc(ptrNSAppleEventDescriptor)
+		      Return AEDeterminePermissionToAutomateTarget(ptrAeDesc, "****", "****", False)
+		      
+		    Catch err As RuntimeException
+		      'ignore: return that process could not be found
+		      Return CType(AEPermissionResult.procNotFound, Int32)
+		    End Try
 		    
 		  #EndIf
 		  
@@ -43,18 +51,19 @@ Protected Module modAppleScriptUtils
 		  #If TargetMacOS Then
 		    //A list of possible links is here: https://macosxautomation.com/system-prefs-links.html
 		    
-		    //[[NSWorkspace sharedWorkspace] openURL:[NSURL URLWithString:@"x-apple.systempreferences:com.apple.preference.security?Privacy_Automation"]];
 		    Declare Function NSClassFromString Lib "Cocoa" (className As CFStringRef) As Ptr
 		    Declare Function sharedWorkspace Lib "AppKit" Selector "sharedWorkspace" ( obj As Ptr ) As Ptr
 		    Declare Function URLWithString Lib "Foundation" Selector "URLWithString:" (ptrNSURLClass As Ptr, url As CFStringRef) As Ptr
 		    Declare Function openURL Lib "AppKit" Selector "openURL:" ( obj As Ptr, url As Ptr ) As Boolean
+		    
 		    Try
-		      Dim ptrNSURLClass As Ptr = NSClassFromString("NSURL")
-		      Dim ptrNSUrl As Ptr = URLWithString(ptrNSURLClass, "x-apple.systempreferences:com.apple.preference.security?Privacy_Automation")
+		      Var ptrNSURLClass As Ptr = NSClassFromString("NSURL")
+		      Var ptrNSUrl As Ptr = URLWithString(ptrNSURLClass, "x-apple.systempreferences:com.apple.preference.security?Privacy_Automation")
 		      
-		      Dim ptrNSWorkspaceClass As Ptr = NSClassFromString("NSWorkspace")
-		      Dim ptrNSWorkspaceSharedWorkspace As Ptr = sharedWorkspace(ptrNSWorkspaceClass)
-		      Return openURL( ptrNSWorkspaceSharedWorkspace, ptrNSUrl)
+		      Var ptrNSWorkspaceClass As Ptr = NSClassFromString("NSWorkspace")
+		      Var ptrNSWorkspaceSharedWorkspace As Ptr = sharedWorkspace(ptrNSWorkspaceClass)
+		      
+		      Return openURL(ptrNSWorkspaceSharedWorkspace, ptrNSUrl)
 		      
 		    Catch err As RuntimeException
 		      'ignore
