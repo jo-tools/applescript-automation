@@ -69,9 +69,8 @@ Protected Module modAppleScriptUtils
 
 
 	#tag Note, Name = Note
-		If you're going to use AppleScript-Automation,
-		then don't forget to add the Info.plist with 
-		a NSAppleEventsUsageDescription to your Xojo project :-)
+		If you're going to use AppleScript-Automation, then don't forget to add the Info.plist with a NSAppleEventsUsageDescription to your Xojo project.
+		If you are CodeSigning (with hardened Runtime) and/or Notarizing your application: Make sure to have the Entitlement enabled: com.apple.security.automation.apple-events.
 		
 		
 		Reset Permissions (of all your apps)
