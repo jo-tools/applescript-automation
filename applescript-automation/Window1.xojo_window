@@ -330,6 +330,32 @@ End
 #tag EndDesktopWindow
 
 #tag WindowCode
+	#tag Method, Flags = &h0
+		Sub CheckTerminalAppRunning()
+		  #If TargetMacOS Then
+		    If (Not ApplicationIsRunning(constBundleIdentifier_Terminal)) Then
+		      Dim d As New MessageDialog
+		      Dim b As MessageDialogButton
+		      d.IconType = MessageDialog.IconTypes.Question
+		      d.ActionButton.Caption = "Launch Terminal.app"
+		      d.CancelButton.Visible = True
+		      d.Title = "Terminal.app"
+		      d.Message = "Launch Terminal.app?"
+		      d.Explanation = "Terminal.app needs to be running, or you'll get 'ProcessNotRunning' as a result."
+		      
+		      b = d.ShowModal(Self)
+		      
+		      Select Case b
+		      Case d.ActionButton
+		        Call LaunchAppByBundleID(constBundleIdentifier_Terminal)
+		      End Select
+		    End If
+		  #EndIf
+		  
+		End Sub
+	#tag EndMethod
+
+
 	#tag Constant, Name = constBundleIdentifier_Terminal, Type = String, Dynamic = False, Default = \"com.apple.Terminal", Scope = Public
 	#tag EndConstant
 
@@ -492,6 +518,8 @@ End
 	#tag Event
 		Sub Pressed()
 		  #If TargetMacOS Then
+		    Self.CheckTerminalAppRunning()
+		    
 		    Dim d As New MessageDialog
 		    Dim b As MessageDialogButton
 		    d.IconType = MessageDialog.IconTypes.Question
@@ -590,6 +618,8 @@ End
 	#tag Event
 		Sub Pressed()
 		  #If TargetMacOS Then
+		    self.CheckTerminalAppRunning()
+		    
 		    Dim d As MessageDialog
 		    #If DebugBuild Then
 		      d = New MessageDialog
