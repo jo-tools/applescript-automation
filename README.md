@@ -5,7 +5,7 @@ Xojo example project
 
 ## Description
 There used to be a time where any application just could execute AppleScripts to Automate other applications such as: `tell application X to do Y`.  
-That's no longer the case starting with `macOS 10.14``. It's become a bit trickier to do that with a Xojo built application, since not everything is built in.
+That's no longer the case starting with `macOS 10.14`. It's become a bit trickier to do that with a Xojo built application, since not everything is built in.
 
 This example project shows:
 - How to use AppleScript for Automation in a Xojo built application by providing an `Info.plist` with `NSAppleEventsUsageDescription`.  
@@ -14,6 +14,18 @@ This example project shows:
 - Explains how to deal with the permission results.
 - In case you determine the application has no permission:  
   How to open System Preferences at Privacy - Automation *(so that the user can allow the app)*.
+
+Additionally:
+- Check if an Application is running *(find .app by BundleIdentifier )*  
+  and if not: launch it.
+
+### ScreenShots
+Automate `Terminal.app` by executing a Shell command in `Terminal.app`  
+![ScreenShot: AppleScript-Automation - Automate Terminal.app](screenshots/automate-terminal-app.png?raw=true)
+
+Determine Permission to automate `Terminal.app`  
+![ScreenShot: AppleScript-Automation - Determine Permission to automate Terminal.app](screenshots/determine-permission.png?raw=true)
+
 
 ## Xojo
 ### Requirements
@@ -26,8 +38,15 @@ The Desktop application Xojo example project ```applescript-automation.xojo_proj
 ### How to use in your own Xojo project?
 1. Drag the example `Info.plist` into your project.  
    Edit it and change the `NSAppleEventsUsageDescription` to fit your app's purpose.
-2. Copy-and-Paste the Module `modAppleScriptUtils` into your project.
-3. Use the provided Methods it in a similar way to this example project.
+2. To determine Automation-Permission and opening System Preferences at Privacy - Automation
+   - copy-and-paste the Module `modAppleScriptUtils` into your project.  
+
+   If you want to check for an .app running *(and launching it if required)* then additionally
+   - copy-and-paste the Module `modMacOsApplications` into your project.
+
+3. Use the provided Methods in the Modules in a similar way to this example project.
+4. If you are [CodeSigning](https://github.com/jo-tools/xojo2dmg) *(with hardened Runtime)* and/or [Notarizing](https://github.com/jo-tools/xojo2dmg) your application:  
+   Make sure to have the `Entitlement` enabled: `com.apple.security.automation.apple-events`
 
 
 ## About
