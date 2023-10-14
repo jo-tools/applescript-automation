@@ -10,14 +10,14 @@ Begin DesktopWindow Window1
    HasFullScreenButton=   False
    HasMaximizeButton=   False
    HasMinimizeButton=   False
-   Height          =   300
+   Height          =   220
    ImplicitInstance=   True
    MacProcID       =   0
    MaximumHeight   =   32000
    MaximumWidth    =   32000
    MenuBar         =   246804479
    MenuBarVisible  =   False
-   MinimumHeight   =   300
+   MinimumHeight   =   220
    MinimumWidth    =   580
    Resizeable      =   False
    Title           =   "AppleScript | Automation"
@@ -230,10 +230,110 @@ Begin DesktopWindow Window1
       _mName          =   ""
       _mPanelIndex    =   0
    End
+   Begin DesktopButton btnDeterminePermission
+      AllowAutoDeactivate=   True
+      Bold            =   False
+      Cancel          =   False
+      Caption         =   "Determine Permission To Automate Terminal.app"
+      Default         =   False
+      Enabled         =   True
+      FontName        =   "System"
+      FontSize        =   0.0
+      FontUnit        =   0
+      Height          =   20
+      Index           =   -2147483648
+      InitialParent   =   ""
+      Italic          =   False
+      Left            =   104
+      LockBottom      =   False
+      LockedInPosition=   True
+      LockLeft        =   True
+      LockRight       =   True
+      LockTop         =   True
+      MacButtonStyle  =   0
+      Scope           =   0
+      TabIndex        =   7
+      TabPanelIndex   =   0
+      TabStop         =   True
+      Tooltip         =   ""
+      Top             =   116
+      Transparent     =   False
+      Underline       =   False
+      Visible         =   True
+      Width           =   360
+   End
+   Begin DesktopButton btnSystemPreferences
+      AllowAutoDeactivate=   True
+      Bold            =   False
+      Cancel          =   False
+      Caption         =   "Open System Preferences at Privacy - Automation"
+      Default         =   False
+      Enabled         =   True
+      FontName        =   "System"
+      FontSize        =   0.0
+      FontUnit        =   0
+      Height          =   20
+      Index           =   -2147483648
+      InitialParent   =   ""
+      Italic          =   False
+      Left            =   104
+      LockBottom      =   False
+      LockedInPosition=   True
+      LockLeft        =   True
+      LockRight       =   True
+      LockTop         =   True
+      MacButtonStyle  =   0
+      Scope           =   0
+      TabIndex        =   8
+      TabPanelIndex   =   0
+      TabStop         =   True
+      Tooltip         =   ""
+      Top             =   148
+      Transparent     =   False
+      Underline       =   False
+      Visible         =   True
+      Width           =   360
+   End
+   Begin DesktopButton btnAutomate
+      AllowAutoDeactivate=   True
+      Bold            =   False
+      Cancel          =   False
+      Caption         =   "Automate Terminal.app"
+      Default         =   False
+      Enabled         =   True
+      FontName        =   "System"
+      FontSize        =   0.0
+      FontUnit        =   0
+      Height          =   20
+      Index           =   -2147483648
+      InitialParent   =   ""
+      Italic          =   False
+      Left            =   104
+      LockBottom      =   False
+      LockedInPosition=   True
+      LockLeft        =   True
+      LockRight       =   True
+      LockTop         =   True
+      MacButtonStyle  =   0
+      Scope           =   0
+      TabIndex        =   9
+      TabPanelIndex   =   0
+      TabStop         =   True
+      Tooltip         =   ""
+      Top             =   180
+      Transparent     =   False
+      Underline       =   False
+      Visible         =   True
+      Width           =   360
+   End
 End
 #tag EndDesktopWindow
 
 #tag WindowCode
+	#tag Constant, Name = constBundleIdentifier_Terminal, Type = String, Dynamic = False, Default = \"com.apple.Terminal", Scope = Public
+	#tag EndConstant
+
+
 #tag EndWindowCode
 
 #tag Events cnvAppIcon
@@ -386,6 +486,229 @@ End
 		  
 		  Return True
 		End Function
+	#tag EndEvent
+#tag EndEvents
+#tag Events btnDeterminePermission
+	#tag Event
+		Sub Pressed()
+		  #If TargetMacOS Then
+		    Dim d As New MessageDialog
+		    Dim b As MessageDialogButton
+		    d.IconType = MessageDialog.IconTypes.Question
+		    d.ActionButton.Caption = "Determine Permission"
+		    d.CancelButton.Visible = True
+		    d.Title = "Example"
+		    d.Message = "Determine Permission To Automate Terminal.app?"
+		    d.Explanation = "This might trigger the macOS Security Dialog." + EndOfLine + _
+		    "Terminal.app needs to be running, or you'll get 'ProcessNotRunning' as a result."
+		    
+		    #If DebugBuild Then
+		      d.Explanation = d.Explanation + EndOfLine + EndOfLine + _
+		      "Note: This is a DebugRun. It seems that each DebugRun (especially if the Debug.app is not codesigned) is considered a 'new application' by macOS. Build the app to see how things behave across multiple launches of the app."
+		    #EndIf
+		    
+		    b = d.ShowModal(Self)
+		    Select Case b
+		    Case d.ActionButton
+		      Dim iRes As Int32 = macOS_AEDeterminePermissionToAutomateTarget(constBundleIdentifier_Terminal)
+		      
+		      Dim sResult As String = "Result: "
+		      Dim sExplanation As String
+		      
+		      Select Case iRes
+		      Case CType(AEPermissionResult.procNotFound, Int32)
+		        sResult = sResult + "Process not found"
+		        sExplanation = "Terminal.app needs to be running in order to determine if it can be automated..."
+		      Case CType(AEPermissionResult.errAEEventWouldRequireUserConsent, Int32)
+		        sResult = sResult + "Would require User consent"
+		        sExplanation = "We don't know that yet... If you're going to automate Terminal.app, this will then trigger the macOS security dialog to ask the user."
+		      Case CType(AEPermissionResult.errAEEventNotPermitted, Int32)
+		        sResult = sResult + "Not Permitted"
+		        sExplanation = "You should probably see that the Checkbox is not selected in System Preferences..."
+		      Case CType(AEPermissionResult.noErr, Int32)
+		        sResult = sResult + "noErr"
+		        sExplanation = "So you should be able to automate Terminal.app"
+		      Else
+		        sResult = sResult +  "Unkown Result"
+		        sExplanation = "AEDeterminePermissionToAutomateTarget returned: " + Str(iRes)
+		      End Select
+		      
+		      
+		      d = New MessageDialog
+		      d.IconType = MessageDialog.IconTypes.Note
+		      d.ActionButton.Caption = "OK"
+		      d.CancelButton.Visible = False
+		      d.Title = "AEDeterminePermissionToAutomateTarget"
+		      d.Message = sResult
+		      d.Explanation = sExplanation
+		      Call d.ShowModal(Self)
+		      
+		    Else
+		      Return
+		    End Select
+		    
+		    
+		  #Else
+		    MsgBox "This example is for macOS only..."
+		  #EndIf
+		End Sub
+	#tag EndEvent
+#tag EndEvents
+#tag Events btnSystemPreferences
+	#tag Event
+		Sub Pressed()
+		  #If TargetMacOS Then
+		    Dim d As New MessageDialog
+		    Dim b As MessageDialogButton
+		    d.IconType = MessageDialog.IconTypes.Question
+		    d.ActionButton.Caption = "System Preferences"
+		    d.CancelButton.Visible = True
+		    d.Title = "Example"
+		    d.Message = "Open System Preferences?"
+		    d.Explanation = "This will open System Preferences at Privacy - Automation."
+		    
+		    b = d.ShowModal(Self)
+		    Select Case b
+		    Case d.ActionButton
+		      If macOS_SystemPreferences_PrivacyAutomation Then
+		        Return
+		      Else
+		        MessageBox "Oops - that didn't work as expected..."
+		      End If
+		    Else
+		      Return
+		    End Select
+		    
+		    
+		  #Else
+		    MsgBox "This example is for macOS only..."
+		  #EndIf
+		End Sub
+	#tag EndEvent
+#tag EndEvents
+#tag Events btnAutomate
+	#tag Event
+		Sub Pressed()
+		  #If TargetMacOS Then
+		    Dim d As MessageDialog
+		    #If DebugBuild Then
+		      d = New MessageDialog
+		      Dim b As MessageDialogButton
+		      d.IconType = MessageDialog.IconTypes.Question
+		      d.ActionButton.Caption = "OK"
+		      d.CancelButton.Visible = True
+		      d.Title = "Example"
+		      d.Message = "Automate Terminal.app."
+		      d.Explanation = "Note: This is a DebugRun. It seems that each DebugRun (especially if the Debug.app is not codesigned) is considered a 'new application' by macOS. Build the app to see how things behave across multiple launches of the app."
+		      b = d.ShowModal(Self)
+		      Select Case b
+		      Case d.ActionButton
+		        'ok, let's continue
+		      Else
+		        Return
+		      End Select
+		    #EndIf
+		    
+		    
+		    '1st we need to make sure Terminal.app is running
+		    'that's not automation yet - the security will kick in later when doing "tell application"
+		    Dim sh As New Shell
+		    sh.Execute("osascript -e 'launch application ""Terminal""' -e 'delay 1'")
+		    If (sh.ExitCode <> 0) Then Break
+		    
+		    'ok, now that Terminal.app should be running, let's determine if we can automate it.
+		    Dim sResult As String
+		    Dim sExplanation As String
+		    
+		    Select Case macOS_AEDeterminePermissionToAutomateTarget(constBundleIdentifier_Terminal)
+		    Case CType(AEPermissionResult.procNotFound, Int32)
+		      sResult = "Process not found"
+		      sExplanation = "Terminal.app needs to be running in order to be automated..."
+		    Case CType(AEPermissionResult.errAEEventWouldRequireUserConsent, Int32)
+		      'dunno - the user will be asked
+		    Case CType(AEPermissionResult.errAEEventNotPermitted, Int32)
+		      sResult = sResult + "Not Permitted"
+		      sExplanation = "You should probably offer the user to open System Preferences, where the Checkbox needs to be set..."
+		    Case CType(AEPermissionResult.noErr, Int32)
+		      'all ok
+		    Else
+		      'who knows what and why...
+		    End Select
+		    
+		    If (sResult <> "") Then
+		      'something is not working, and we know it
+		      d = New MessageDialog
+		      d.IconType = MessageDialog.IconTypes.Note
+		      d.ActionButton.Caption = "OK"
+		      d.CancelButton.Visible = False
+		      d.Title = "Error"
+		      d.Message = sResult
+		      d.Explanation = sExplanation
+		      Call d.ShowModal(Self)
+		      Return
+		    End If
+		    
+		    Dim sTitle As String = ""
+		    sResult = ""
+		    sExplanation = ""
+		    
+		    '**********************************************************
+		    'AppleScript - let's automate Terminal.app
+		    '**********************************************************
+		    'Note:
+		    'If you're going to use AppleScript-Automation,
+		    'then don't forget to add the Info.plist with 
+		    'a NSAppleEventsUsageDescription to your Xojo project :-)
+		    '**********************************************************
+		    'Reset Permissions (of all your apps)
+		    'In Terminal, execute: tccutil reset AppleEvents
+		    '**********************************************************
+		    
+		    Dim oNow As DateTime = DateTime.Now
+		    sh.Execute("osascript -e 'tell application ""Terminal""' -e 'if not (exists window 1) then reopen' -e 'activate' -e 'do script ""echo \""Xojo AppleScript Example " + oNow.SQLDateTime + "\"""" in Window 1' -e 'activate' -e 'end tell'")
+		    
+		    If (sh.ExitCode = 0) Then
+		      'all ok
+		      sTitle = "Success"
+		      sResult = "All done..."
+		      sExplanation = "Terminal.app has been automated and you should see an output there."
+		    Else
+		      'it didn't work...
+		      sTitle = "Error"
+		      sResult = "Unknown Error"
+		      sExplanation = "Something didn't work as expected. Terminal.app has not been automated."
+		      
+		      'could it be that the user hasn't allowed automation when having been asked just before?
+		      Select Case macOS_AEDeterminePermissionToAutomateTarget(constBundleIdentifier_Terminal)
+		      Case CType(AEPermissionResult.procNotFound, Int32)
+		        'should no longer be the case
+		      Case CType(AEPermissionResult.errAEEventWouldRequireUserConsent, Int32)
+		        'should no longer be the case - the user would have been asked when trying to automate...
+		      Case CType(AEPermissionResult.errAEEventNotPermitted, Int32)
+		        sResult = "Not Permitted"
+		        sExplanation = "You should probably offer the user to open System Preferences, where the Checkbox needs to be set. Then try again after having allowed Automation.."
+		      Case CType(AEPermissionResult.noErr, Int32)
+		        'all ok
+		      Else
+		        'who knows what and why...
+		      End Select
+		    End If
+		    
+		    'Notify with success/error
+		    d = New MessageDialog
+		    d.IconType = MessageDialog.IconTypes.Note
+		    d.ActionButton.Caption = "OK"
+		    d.CancelButton.Visible = False
+		    d.Title = sTitle
+		    d.Message = sResult
+		    d.Explanation = sExplanation
+		    Call d.ShowModal(Self)
+		    
+		  #Else
+		    MsgBox "This example is for macOS only..."
+		  #EndIf
+		  
+		End Sub
 	#tag EndEvent
 #tag EndEvents
 #tag ViewBehavior
