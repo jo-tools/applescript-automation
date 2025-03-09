@@ -32,7 +32,7 @@ Determine Permission to automate `Terminal.app`
 [Xojo](https://www.xojo.com/) is a rapid application development for Desktop, Web, Mobile & Raspberry Pi.  
 
 The Desktop application Xojo example project ```applescript-automation.xojo_project``` is using:
-- Xojo 2023r3
+- Xojo 2024r4.2
 - API 2
 
 ### How to use in your own Xojo project?
@@ -45,8 +45,10 @@ The Desktop application Xojo example project ```applescript-automation.xojo_proj
    - copy-and-paste the Module `modMacOsApplications` into your project.
 
 3. Use the provided Methods in the Modules in a similar way to this example project.
-4. If you are [CodeSigning](https://github.com/jo-tools/xojo2dmg) *(with hardened Runtime)* and/or [Notarizing](https://github.com/jo-tools/xojo2dmg) your application:  
+4. [Codesign](https://github.com/jo-tools/xojo2dmg) *(with hardened Runtime)* and/or [Notarize](https://github.com/jo-tools/xojo2dmg) your application:  
    Make sure to have the `Entitlement` enabled: `com.apple.security.automation.apple-events`
+   - set Xojo Build Settings: macOS -> Sign
+   - or use [Xojo2DMG](https://github.com/jo-tools/xojo2dmg)
 
 
 ## About
