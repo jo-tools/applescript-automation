@@ -43,7 +43,7 @@ Begin DesktopWindow Window1
       TabIndex        =   0
       TabPanelIndex   =   0
       TabStop         =   True
-      Tooltip         =   "https://www.jo-tools.ch/xojo/applescript-automation/"
+      Tooltip         =   "#kURL_Repository"
       Top             =   20
       Transparent     =   True
       Visible         =   True
@@ -74,7 +74,7 @@ Begin DesktopWindow Window1
       Text            =   "AppleScript | Automation"
       TextAlignment   =   0
       TextColor       =   &c0072D800
-      Tooltip         =   "https://www.jo-tools.ch/xojo/applescript-automation/"
+      Tooltip         =   "#kURL_Repository"
       Top             =   20
       Transparent     =   True
       Underline       =   True
@@ -170,7 +170,7 @@ Begin DesktopWindow Window1
       Text            =   "Contact"
       TextAlignment   =   0
       TextColor       =   &c0072CE00
-      Tooltip         =   "xojo@jo-tools.ch"
+      Tooltip         =   "#kEmail_Contact"
       Top             =   54
       Transparent     =   True
       Underline       =   True
@@ -196,7 +196,7 @@ Begin DesktopWindow Window1
       TabIndex        =   5
       TabPanelIndex   =   0
       TabStop         =   True
-      Tooltip         =   "https://paypal.me/jotools"
+      Tooltip         =   "#kURL_PayPal"
       Top             =   54
       Transparent     =   True
       Visible         =   True
@@ -359,6 +359,15 @@ End
 	#tag Constant, Name = constBundleIdentifier_Terminal, Type = String, Dynamic = False, Default = \"com.apple.Terminal", Scope = Public
 	#tag EndConstant
 
+	#tag Constant, Name = kEmail_Contact, Type = String, Dynamic = False, Default = \"xojo@jo-tools.ch", Scope = Private
+	#tag EndConstant
+
+	#tag Constant, Name = kURL_PayPal, Type = String, Dynamic = False, Default = \"https://paypal.me/jotools", Scope = Private
+	#tag EndConstant
+
+	#tag Constant, Name = kURL_Repository, Type = String, Dynamic = False, Default = \"https://github.com/jo-tools/applescript-automation", Scope = Private
+	#tag EndConstant
+
 
 #tag EndWindowCode
 
@@ -373,7 +382,7 @@ End
 	#tag Event
 		Sub MouseUp(x As Integer, y As Integer)
 		  If (x >= 0) And (x < Me.Width) And (y > 0) And (y < Me.Height) Then
-		    System.GotoURL("https://www.jo-tools.ch/xojo/applescript-automation/")
+		    System.GotoURL(kURL_Repository)
 		  End If
 		End Sub
 	#tag EndEvent
@@ -408,7 +417,7 @@ End
 	#tag Event
 		Sub MouseUp(x As Integer, y As Integer)
 		  If (x >= 0) And (x < Me.Width) And (y > 0) And (y < Me.Height) Then
-		    System.GotoURL("https://www.jo-tools.ch/xojo/applescript-automation/")
+		    System.GotoURL(kURL_Repository)
 		  End If
 		End Sub
 	#tag EndEvent
@@ -467,7 +476,7 @@ End
 	#tag Event
 		Sub MouseUp(x As Integer, y As Integer)
 		  If (x >= 0) And (x < Me.Width) And (y > 0) And (y < Me.Height) Then
-		    System.GotoURL("mailto:xojo@jo-tools.ch")
+		    System.GotoURL("mailto:" + kEmail_Contact)
 		  End If
 		End Sub
 	#tag EndEvent
@@ -501,7 +510,7 @@ End
 	#tag Event
 		Sub MouseUp(x As Integer, y As Integer)
 		  If (x >= 0) And (x < Me.Width) And (y > 0) And (y < Me.Height) Then
-		    System.GotoURL("https://paypal.me/jotools")
+		    System.GotoURL(kURL_PayPal)
 		  End If
 		End Sub
 	#tag EndEvent
